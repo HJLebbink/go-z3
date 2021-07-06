@@ -2,10 +2,11 @@ package z3
 
 import (
 	"fmt"
+	"testing"
 )
 
 // This example is a basic mathematical example
-func ExampleBasicMath() {
+func Test_BasicMath(t *testing.T) {
 	// Create the context
 	config := NewConfig()
 	ctx := NewContext(config)
@@ -28,50 +29,68 @@ func ExampleBasicMath() {
 	x := ctx.Const(ctx.Symbol("x"), ctx.IntSort())
 	y := ctx.Const(ctx.Symbol("y"), ctx.IntSort())
 	z := ctx.Const(ctx.Symbol("z"), ctx.IntSort())
+	{
+		zero := ctx.Int(0, ctx.IntSort()) // To save repeats
 
-	zero := ctx.Int(0, ctx.IntSort()) // To save repeats
+		// x + y + z > 4
+		s.Assert(x.Add(y, z).Gt(ctx.Int(4, ctx.IntSort())))
 
-	// x + y + z > 4
-	s.Assert(x.Add(y, z).Gt(ctx.Int(4, ctx.IntSort())))
+		// x + y < 2
+		s.Assert(x.Add(y).Lt(ctx.Int(2, ctx.IntSort())))
 
-	// x + y < 2
-	s.Assert(x.Add(y).Lt(ctx.Int(2, ctx.IntSort())))
+		// z > 0
+		s.Assert(z.Gt(zero))
 
-	// z > 0
-	s.Assert(z.Gt(zero))
+		// x != y != z
+		s.Assert(x.Distinct(y, z))
 
-	// x != y != z
-	s.Assert(x.Distinct(y, z))
+		// x, y, z != 0
+		s.Assert(x.Eq(zero).Not())
+		s.Assert(y.Eq(zero).Not())
+		s.Assert(z.Eq(zero).Not())
 
-	// x, y, z != 0
-	s.Assert(x.Eq(zero).Not())
-	s.Assert(y.Eq(zero).Not())
-	s.Assert(z.Eq(zero).Not())
+		// x + y = -3
+		s.Assert(x.Add(y).Eq(ctx.Int(-3, ctx.IntSort())))
 
-	// x + y = -3
-	s.Assert(x.Add(y).Eq(ctx.Int(-3, ctx.IntSort())))
-
-	if v := s.Check(); v != True {
-		fmt.Println("Unsolveable")
-		return
+		if v := s.Check(); v != True {
+			fmt.Println("Unsolveable")
+			return
+		}
 	}
 
 	// Get the resulting model:
 	m := s.Model()
 	assignments := m.Assignments()
 	m.Close()
-	fmt.Printf("x = %s\n", assignments["x"])
-	fmt.Printf("y = %s\n", assignments["y"])
-	fmt.Printf("z = %s\n", assignments["z"])
 
-	// Output:
-	// x = (- 2)
-	// y = (- 1)
-	// z = 8
+	{
+		var xs = assignments["x"].String()
+		var ys = assignments["y"].String()
+		var zs = assignments["z"].String()
+
+		if xs != "(- 2)" {
+			t.Fatalf("")
+		}
+		if ys != "(- 1)" {
+			t.Fatalf("")
+		}
+		if zs != "8" {
+			t.Fatalf("")
+		}
+		// Output:
+		// x = (- 2)
+		// y = (- 1)
+		// z = 8
+		if false {
+			fmt.Printf("x = %s\n", xs)
+			fmt.Printf("y = %s\n", ys)
+			fmt.Printf("z = %s\n", zs)
+		}
+	}
 }
 
 // From C examples: demorgan
-func ExampleDemorgan() {
+func Test_Demorgan(t *testing.T) {
 	// Create the context
 	config := NewConfig()
 	ctx := NewContext(config)
@@ -102,17 +121,17 @@ func ExampleDemorgan() {
 	// Assert the constraints
 	s.Assert(negConj)
 
-	if v := s.Check(); v == False {
-		fmt.Println("DeMorgan is valid")
-		return
-	}
+	var v LBool = s.Check()
 
+	if v != False {
+		t.Fatalf("")
+	}
 	// Output:
 	// DeMorgan is valid
 }
 
 // From C examples: find_model_example2
-func ExampleFindModel2() {
+func Test_FindModel2(t *testing.T) {
 	// Create the context
 	config := NewConfig()
 	defer config.Close()
@@ -143,10 +162,8 @@ func ExampleFindModel2() {
 	s.Assert(c2)
 
 	{
-		// Solve
-		fmt.Println("Solving part 1")
 		if v := s.Check(); v != True {
-			fmt.Println("unsatisfied!")
+			t.Logf("unsatisfied!")
 			return
 		}
 
@@ -154,8 +171,16 @@ func ExampleFindModel2() {
 		m := s.Model()
 		assignments := m.Assignments()
 		m.Close()
-		fmt.Printf("x = %s\n", assignments["x"])
-		fmt.Printf("y = %s\n", assignments["y"])
+
+		var xs = assignments["x"].Int()
+		var ys = assignments["y"].Int()
+
+		if xs != 3 {
+			t.Fatalf("")
+		}
+		if ys != 3 {
+			t.Fatalf("")
+		}
 	}
 
 	// Create some new assertions
@@ -166,9 +191,8 @@ func ExampleFindModel2() {
 
 	{
 		// Solve
-		fmt.Println("\nSolving part 2")
 		if v := s.Check(); v != True {
-			fmt.Println("unsatisfied!")
+			t.Logf("unsatisfied!")
 			return
 		}
 
@@ -176,16 +200,15 @@ func ExampleFindModel2() {
 		m := s.Model()
 		assignments := m.Assignments()
 		m.Close()
-		fmt.Printf("x = %s\n", assignments["x"])
-		fmt.Printf("y = %s", assignments["y"])
-	}
 
-	// Output:
-	// Solving part 1
-	// x = 0
-	// y = 1
-	//
-	// Solving part 2
-	// x = 0
-	// y = 1
+		var xs = assignments["x"].Int()
+		var ys = assignments["y"].Int()
+
+		if xs != 3 {
+			t.Fatalf("")
+		}
+		if ys != 4 {
+			t.Fatalf("")
+		}
+	}
 }
