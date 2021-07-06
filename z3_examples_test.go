@@ -128,8 +128,8 @@ func ExampleFindModel2() {
 	y := ctx.Const(ctx.Symbol("y"), ctx.IntSort())
 
 	// Create a couple integers
-	v1 := ctx.Const(ctx.SymbolInt(1), ctx.IntSort())
-	v2 := ctx.Const(ctx.SymbolInt(2), ctx.IntSort())
+	v1 := ctx.Int(1, ctx.IntSort())
+	v2 := ctx.Int(2, ctx.IntSort())
 
 	// y + 1
 	y_plus_one := y.Add(v1)
