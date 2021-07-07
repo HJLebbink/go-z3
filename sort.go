@@ -24,3 +24,27 @@ func (c *Context) IntSort() *Sort {
 		rawSort: C.Z3_mk_int_sort(c.raw),
 	}
 }
+
+// RealSort returns the boolean type.
+func (c *Context) RealSort() *Sort {
+	return &Sort{
+		rawCtx:  c.raw,
+		rawSort: C.Z3_mk_real_sort(c.raw),
+	}
+}
+
+// StringSort returns the string type.
+func (c *Context) StringSort() *Sort {
+	return &Sort{
+		rawCtx:  c.raw,
+		rawSort: C.Z3_mk_string_sort(c.raw),
+	}
+}
+
+// SeqSort returns the seq type.
+func (c *Context) SeqSort(sort Sort) *Sort{
+	return &Sort{
+		rawCtx:  c.raw,
+		rawSort: C.Z3_mk_seq_sort(c.raw, sort.rawSort),
+	}
+}

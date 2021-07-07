@@ -53,6 +53,79 @@ func (c *Context) Int(v int, typ *Sort) *AST {
 	}
 }
 
+// Real creates a real type.
+//
+// Maps: Z3_mk_real
+func (c *Context) Real(num int, den int, typ *Sort) *AST {
+	return &AST{
+		rawCtx: c.raw,
+		rawAST: C.Z3_mk_real(c.raw, C.int(num), C.int(den)),
+	}
+}
+
+// Float creates an float type.
+//
+// Maps: Z3_mk_real
+func (c *Context) Float(v float64) *AST {
+	//TODO: test if this could work
+	return &AST{
+		rawCtx: c.raw,
+		rawAST: C.Z3_mk_real(c.raw, C.int(v), C.int(1)),
+	}
+}
+
+// Str creates an string type.
+//
+// Maps: Z3_mk_string
+func (c *Context) Str(str string) *AST {
+	//TODO: test if this could work
+	return &AST{
+		rawCtx: c.raw,
+		rawAST: C.Z3_mk_string(c.raw, C.CString(str)),
+	}
+}
+
+
+
+// RealSeq returns the seq type number.
+func (c *Context) RealSet(reals ...float64) *AST {
+	set := &AST{
+		rawCtx: c.raw,
+		rawAST: C.Z3_mk_empty_set(
+			c.raw,
+			c.RealSort().rawSort,
+		),
+	}
+	for _, content := range reals {
+		C.Z3_mk_set_add(
+			c.raw,
+			set.rawAST,
+			c.Float(content).rawAST,
+		)
+	}
+	return set
+}
+
+// StringSet returns the seq type string.
+func (c *Context) StringSet(strings ...string) *AST {
+	set := &AST{
+		rawCtx: c.raw,
+		rawAST: C.Z3_mk_empty_set(
+			c.raw,
+			c.StringSort().rawSort,
+		),
+	}
+	for _, content := range strings {
+		C.Z3_mk_set_add(
+			c.raw,
+			set.rawAST,
+			c.Str(content).rawAST,
+		)
+	}
+	return set
+}
+
+
 // True creates the value "true".
 //
 // Maps: Z3_mk_true
@@ -83,4 +156,12 @@ func (a *AST) Int() int {
 	var dst C.int
 	C.Z3_get_numeral_int(a.rawCtx, a.rawAST, &dst)
 	return int(dst)
+}
+
+
+func (a *AST) Simplify() *AST {
+	return &AST{
+		rawCtx: a.rawCtx,
+		rawAST: C.Z3_simplify(a.rawCtx, a.rawAST),
+	}
 }

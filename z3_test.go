@@ -5,13 +5,23 @@ import (
 	"testing"
 )
 
+func CreateSolver() (solver *Solver, ctx *Context) {
+	config := NewConfig()
+	ctx = NewContext(config)
+	err := config.Close()
+	if err != nil {
+		return nil, nil
+	}
+	//defer ctx.Close()
+
+	solver = ctx.NewSolver()
+	//defer solver.Close()
+	return
+}
+
 // This example is a basic mathematical example
 func Test_BasicMath(t *testing.T) {
-	// Create the context
-	config := NewConfig()
-	ctx := NewContext(config)
-	config.Close()
-	defer ctx.Close()
+	var s, ctx = CreateSolver()
 
 	// Logic:
 	// x + y + z > 4
@@ -20,10 +30,6 @@ func Test_BasicMath(t *testing.T) {
 	// x != y != z
 	// x, y, z != 0
 	// x + y = -3
-
-	// Create the solver
-	s := ctx.NewSolver()
-	defer s.Close()
 
 	// Vars
 	x := ctx.Const(ctx.Symbol("x"), ctx.IntSort())
@@ -92,10 +98,7 @@ func Test_BasicMath(t *testing.T) {
 // From C examples: demorgan
 func Test_Demorgan(t *testing.T) {
 	// Create the context
-	config := NewConfig()
-	ctx := NewContext(config)
-	config.Close()
-	defer ctx.Close()
+	var s, ctx = CreateSolver()
 
 	// Create a couple variables
 	x := ctx.Const(ctx.Symbol("x"), ctx.BoolSort())
@@ -114,10 +117,6 @@ func Test_Demorgan(t *testing.T) {
 	conj := not_x_and_y.Iff(not_x_or_not_y)
 	negConj := conj.Not()
 
-	// Create the solver
-	s := ctx.NewSolver()
-	defer s.Close()
-
 	// Assert the constraints
 	s.Assert(negConj)
 
@@ -132,15 +131,7 @@ func Test_Demorgan(t *testing.T) {
 
 // From C examples: find_model_example2
 func Test_FindModel2(t *testing.T) {
-	// Create the context
-	config := NewConfig()
-	defer config.Close()
-	ctx := NewContext(config)
-	defer ctx.Close()
-
-	// Create the solver
-	s := ctx.NewSolver()
-	defer s.Close()
+	var s, ctx = CreateSolver()
 
 	// Create a couple variables
 	x := ctx.Const(ctx.Symbol("x"), ctx.IntSort())
@@ -211,4 +202,37 @@ func Test_FindModel2(t *testing.T) {
 			t.Fatalf("")
 		}
 	}
+}
+
+// see https://stackoverflow.com/questions/11507360/t-1-or-t-2-t-1
+func Test_single_int_range_simplification(t *testing.T) {
+	var solver, ctx = CreateSolver()
+	var x *AST = ctx.Const(ctx.Symbol("x"), ctx.IntSort())
+
+
+	//(x > 6) OR (x < 12) -> TRUE
+
+	//(x > 6) AND (x < 12) -> (x > 6) AND (x < 12)
+
+	//(x < 6) OR (x > 12) -> (x < 6) OR (x > 12)
+
+	//(x < 6) AND (x > 12) -> FALSE
+
+	//(x > 6) OR (x < 6) -> x != 6
+
+
+	var int6 = ctx.Int(6, ctx.IntSort())
+	var int12 = ctx.Int(12, ctx.IntSort())
+
+	//(x > 6) OR (x > 12) -> (x > 12)
+	//solver.Assert(x.Or(x.Gt(int6), x.Gt(int12)))
+
+	//(x > 6) AND (x > 12) -> (x > 6)
+	solver.Assert(x.Gt(int6))
+	solver.Assert(x.Gt(int12))
+	//var y *AST = x.Simplify()
+
+//	s
+
+//	fmt.Printf("%s\n", y.String())
 }
