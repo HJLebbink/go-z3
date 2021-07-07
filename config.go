@@ -15,19 +15,6 @@ import "C"
 // Z3 docs for information on available parameters. They can be set with
 // SetParamValue.
 //
-// As for 2016-03-02, the parameters available are documented as:
-//
-// proof (Boolean) Enable proof generation
-// debug_ref_count (Boolean) Enable debug support for Z3_ast reference counting
-// trace (Boolean) Tracing support for VCC
-// trace_file_name (String) Trace out file for VCC traces
-// timeout (unsigned) default timeout (in milliseconds) used for solvers
-// well_sorted_check type checker
-// auto_config use heuristics to automatically select solver and configure it
-// model model generation for solvers, this parameter can be overwritten when creating a solver
-// model_validate validate models produced by solvers
-// unsat_core unsat-core generation for solvers, this parameter can be overwritten when creating a solver
-//
 type Config struct {
 	raw C.Z3_config
 }
@@ -45,7 +32,27 @@ func (c *Config) Close() error {
 	return nil
 }
 
-// SetParamValue sets the parameters for a Config. See the Config docs.
+/*
+  SetParamValue sets the parameters for a Config.
+
+  auto_config (bool) (default: true)
+  debug_ref_count (bool) (default: false)
+  dot_proof_file (string) (default: proof.dot)
+  dump_models (bool) (default: false)
+  model (bool) (default: true)
+  model_validate (bool) (default: false)
+  proof (bool) (default: false)
+  rlimit (unsigned int) (default: 0)
+  smtlib2_compliant (bool) (default: false)
+  stats (bool) (default: false)
+  timeout (unsigned int) (default: 4294967295)
+  trace (bool) (default: false)
+  trace_file_name (string) (default: z3.log)
+  type_check (bool) (default: true)
+  unicode (bool)
+  unsat_core (bool) (default: false)
+  well_sorted_check (bool) (default: false)
+ */
 func (c *Config) SetParamValue(k, v string) {
 	ck := C.CString(k)
 	cv := C.CString(v)

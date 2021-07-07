@@ -34,6 +34,26 @@ func (s *Solver) Close() error {
 	return nil
 }
 
+// Remove all assertions from the solver.
+//
+// Maps to: Z3_solver_reset
+func (s *Solver) Reset()  {
+	C.Z3_solver_reset(s.rawCtx, s.rawSolver)
+}
+
+// Convert a solver into a string.
+//
+// Maps to: Z3_solver_to_string
+func (s *Solver) String() string {
+	return C.GoString(C.Z3_solver_to_string(s.rawCtx, s.rawSolver))
+}
+
+// Maps to: Z3_solver_set_params
+func (s *Solver) SetParams(p *Params) {
+	C.Z3_solver_set_params(s.rawCtx, s.rawSolver, p.rawParams)
+}
+
+
 // Assert asserts a constraint onto the Solver.
 //
 // Maps to: Z3_solver_assert

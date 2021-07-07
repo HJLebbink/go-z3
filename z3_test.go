@@ -207,17 +207,16 @@ func Test_FindModel2(t *testing.T) {
 // see https://stackoverflow.com/questions/11507360/t-1-or-t-2-t-1
 func Test_single_int_range_simplification(t *testing.T) {
 	var solver, ctx = CreateSolver()
+	var params *Params = ctx.NewParams()
+	params.SetBool(ctx.Symbol("ctx-solver-simplify"), true)
+	//params.SetBool(ctx.Symbol("simplify"), true)
+
 	var x *AST = ctx.Const(ctx.Symbol("x"), ctx.IntSort())
 
-
 	//(x > 6) OR (x < 12) -> TRUE
-
 	//(x > 6) AND (x < 12) -> (x > 6) AND (x < 12)
-
 	//(x < 6) OR (x > 12) -> (x < 6) OR (x > 12)
-
 	//(x < 6) AND (x > 12) -> FALSE
-
 	//(x > 6) OR (x < 6) -> x != 6
 
 
@@ -225,14 +224,27 @@ func Test_single_int_range_simplification(t *testing.T) {
 	var int12 = ctx.Int(12, ctx.IntSort())
 
 	//(x > 6) OR (x > 12) -> (x > 12)
-	//solver.Assert(x.Or(x.Gt(int6), x.Gt(int12)))
+
+	var y *AST = x.Gt(int6).Or(x.Gt(int12))
+	var z *AST = y.SimplifyEx(params)
+
+	solver.Assert(z)
+
+	if satisfiable := solver.Check(); satisfiable != True {
+		t.Logf("unsatisfiable!")
+	} else {
+		fmt.Printf(solver.String())
+		solver.Check()
+	}
+
+
+
+	//fmt.Printf("%v\n", z.SimplifyGetHelp())
 
 	//(x > 6) AND (x > 12) -> (x > 6)
-	solver.Assert(x.Gt(int6))
-	solver.Assert(x.Gt(int12))
+	//solver.Assert(x.Gt(int6))
+	//solver.Assert(x.Gt(int12))
 	//var y *AST = x.Simplify()
-
-//	s
 
 //	fmt.Printf("%s\n", y.String())
 }

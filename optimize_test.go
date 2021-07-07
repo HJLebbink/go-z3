@@ -1,6 +1,7 @@
 package z3
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -53,5 +54,5 @@ func TestOptimize(t *testing.T) {
 	// Get the model
 	m := o.Model()
 	defer m.Close()
-	t.Logf("\nModel:\n%s", m.String())
+	fmt.Printf("\nModel:\n%s", m.String())
 }

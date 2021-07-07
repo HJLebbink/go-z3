@@ -7,7 +7,6 @@ import (
 func TestSolver(t *testing.T) {
 	config := NewConfig()
 	defer config.Close()
-
 	ctx := NewContext(config)
 	defer ctx.Close()
 

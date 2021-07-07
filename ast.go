@@ -158,10 +158,30 @@ func (a *AST) Int() int {
 	return int(dst)
 }
 
-
+// Provides an interface to the AST simplifier used by Z3.
+//
+// Maps: Z3_simplify
 func (a *AST) Simplify() *AST {
 	return &AST{
 		rawCtx: a.rawCtx,
 		rawAST: C.Z3_simplify(a.rawCtx, a.rawAST),
 	}
 }
+
+// Provides an interface to the AST simplifier used by Z3.
+//
+// Maps: Z3_simplify
+func (a *AST) SimplifyEx(p *Params) *AST {
+	return &AST{
+		rawCtx: a.rawCtx,
+		rawAST: C.Z3_simplify_ex(a.rawCtx, a.rawAST, p.rawParams),
+	}
+}
+
+// Return a string describing all available parameters.
+//
+// Maps: Z3_simplify_get_help
+func (a *AST) SimplifyGetHelp() string {
+	return C.GoString(C.Z3_simplify_get_help(a.rawCtx))
+}
+
