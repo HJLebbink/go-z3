@@ -23,10 +23,24 @@ func (c *Context) NewSolver() *Solver {
 	C.Z3_solver_inc_ref(c.raw, rawSolver)
 
 	return &Solver{
-		rawSolver: rawSolver,
 		rawCtx:    c.raw,
+		rawSolver: rawSolver,
 	}
 }
+
+// Create a new solver that is implemented using the given tactic.
+//
+// Maps to: Z3_mk_solver_from_tactic
+func (c *Context) NewSolverFromTactic(t *Tactic) *Solver {
+	rawSolver := C.Z3_mk_solver_from_tactic(c.raw, t.rawTactic)
+	C.Z3_solver_inc_ref(c.raw, rawSolver)
+
+	return &Solver{
+		rawCtx:    c.raw,
+		rawSolver: rawSolver,
+	}
+}
+
 
 // Close frees the memory associated with this.
 func (s *Solver) Close() error {

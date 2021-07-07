@@ -19,6 +19,22 @@ func CreateSolver() (solver *Solver, ctx *Context) {
 	return
 }
 
+func CreateSolverTactic(tactic_name string) (solver *Solver, ctx *Context, tactic *Tactic) {
+	config := NewConfig()
+	ctx = NewContext(config)
+	err := config.Close()
+	if err != nil {
+		return nil, nil, nil
+	}
+	//defer ctx.Close()
+	tactic = ctx.NewTactic(tactic_name)
+
+	solver = ctx.NewSolverFromTactic(tactic)
+	//defer solver.Close()
+	return
+}
+
+
 // This example is a basic mathematical example
 func Test_BasicMath(t *testing.T) {
 	var s, ctx = CreateSolver()
@@ -206,10 +222,11 @@ func Test_FindModel2(t *testing.T) {
 
 // see https://stackoverflow.com/questions/11507360/t-1-or-t-2-t-1
 func Test_single_int_range_simplification(t *testing.T) {
-	var solver, ctx = CreateSolver()
+	var solver, ctx, _ = CreateSolverTactic("ctx-simplify")
 	var params *Params = ctx.NewParams()
 	params.SetBool(ctx.Symbol("ctx-solver-simplify"), true)
 	//params.SetBool(ctx.Symbol("simplify"), true)
+
 
 	var x *AST = ctx.Const(ctx.Symbol("x"), ctx.IntSort())
 

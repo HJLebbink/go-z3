@@ -9,16 +9,21 @@ type Tactic struct {
 }
 
 
-func (c *Context) NewTactic() *Tactic {
+// Return a tactic associated with the given name.
+func (c *Context) NewTactic(name string) *Tactic {
 	return &Tactic{
 		rawCtx: c.raw,
-		rawTactic: C.Z3_mk_tactic(c.raw),
+		rawTactic: C.Z3_mk_tactic(c.raw, C.CString(name)),
 	}
 }
 
-// String returns a human-friendly string version of the model.
+// String returns a human-friendly string version of the tactic.
 func (t *Tactic) String() string {
 	return C.GoString(C.Z3_tactic_to_string(t.rawCtx, t.rawTactic))
+}
+
+func (c *Context) GetTacticNames() string {
+	return "qfaufbv, qfauflia, qfbv, qfidl, qflia, qflra, qfnia, qfnra, qfufbv, qfufbv_ackr, qfufnra, qfuf, ufnia, uflra, auflia, auflira, aufnira, lra, lia, lira, ackermannize_bv, simplify, propagate-values, ctx-simplify"
 }
 
 //-------------------------------------------------------------------
