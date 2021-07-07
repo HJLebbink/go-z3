@@ -11,7 +11,7 @@
 // ErrorHandler and Context.SetErrorHandler for more information.
 package z3
 
-// #cgo CFLAGS: -Ivendor/z3/src/api
+// #cgo CFLAGS: -I../z3/src/api
 // #cgo LDFLAGS: ${SRCDIR}/libz3.dll -lstdc++ -lm
 // #include <stdlib.h>
 // #include "go-z3.h"
