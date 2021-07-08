@@ -221,12 +221,28 @@ func Test_FindModel2(t *testing.T) {
 }
 
 // see https://stackoverflow.com/questions/11507360/t-1-or-t-2-t-1
+// see https://stackoverflow.com/questions/38511917/z3-c-api-set-parameter-for-tactic
 func Test_single_int_range_simplification(t *testing.T) {
-	var solver, ctx, _ = CreateSolverTactic("ctx-simplify")
-	var params *Params = ctx.NewParams()
-	params.SetBool(ctx.Symbol("ctx-solver-simplify"), true)
-	//params.SetBool(ctx.Symbol("simplify"), true)
 
+	config := NewConfig()
+	var ctx = NewContext(config)
+	config.Close()
+	//defer ctx.Close()
+
+	var params *Params = ctx.NewParams()
+	//params.SetBool(ctx.Symbol("ctx-solver-simplify"), true)
+	//params.SetBool(ctx.Symbol("simplify"), true)
+	params.SetBool(ctx.Symbol("arith_lhs"), true)
+	params.SetBool(ctx.Symbol("eq2ineq"), true)
+	fmt.Printf("params = %v\n", params.String())
+
+	var goal *Goal = ctx.NewGoal(true, true, false)
+	//fmt.Printf("goal = %v\n", goal.String())
+	//defer goal.Close()
+
+	var tactic *Tactic = ctx.NewTactic("simplify").With(params)
+	//fmt.Printf("tactic = %v\n", tactic.String())
+	//defer tactic.Close()
 
 	var x *AST = ctx.Const(ctx.Symbol("x"), ctx.IntSort())
 
@@ -236,25 +252,31 @@ func Test_single_int_range_simplification(t *testing.T) {
 	//(x < 6) AND (x > 12) -> FALSE
 	//(x > 6) OR (x < 6) -> x != 6
 
-
 	var int6 = ctx.Int(6, ctx.IntSort())
 	var int12 = ctx.Int(12, ctx.IntSort())
 
 	//(x > 6) OR (x > 12) -> (x > 12)
 
 	var y *AST = x.Gt(int6).Or(x.Gt(int12))
-	var z *AST = y.SimplifyEx(params)
+	fmt.Printf("y = %v\n", y.String())
+	goal.Assert(y)
+	fmt.Printf("goal = %v\n", goal.String())
+	//var r *ApplyResult = tactic.TacticApplyEx(goal, params)
+	var r *ApplyResult = tactic.TacticApply(goal)
+	fmt.Printf("ApplyResult = %v\n", r.String())
 
+	/*
+	var z *AST = y.SimplifyEx(params)
+	fmt.Printf("y = %v\nz = %v\n", y.String(), z.String())
 	solver.Assert(z)
+	fmt.Printf("%v\n", solver.String())
+
 
 	if satisfiable := solver.Check(); satisfiable != True {
-		t.Logf("unsatisfiable!")
+		fmt.Printf("unsatisfiable!")
 	} else {
-		fmt.Printf(solver.String())
-		solver.Check()
+		fmt.Printf("%v\n", solver.String())
 	}
-
-
 
 	//fmt.Printf("%v\n", z.SimplifyGetHelp())
 
@@ -264,4 +286,5 @@ func Test_single_int_range_simplification(t *testing.T) {
 	//var y *AST = x.Simplify()
 
 //	fmt.Printf("%s\n", y.String())
+*/
 }

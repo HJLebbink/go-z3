@@ -19,11 +19,10 @@ type Solver struct {
 
 // NewSolver creates a new solver.
 func (c *Context) NewSolver() *Solver {
-	rawSolver := C.Z3_mk_solver(c.raw)
-	C.Z3_solver_inc_ref(c.raw, rawSolver)
-
+	rawSolver := C.Z3_mk_solver(c.rawCtx)
+	C.Z3_solver_inc_ref(c.rawCtx, rawSolver)
 	return &Solver{
-		rawCtx:    c.raw,
+		rawCtx:    c.rawCtx,
 		rawSolver: rawSolver,
 	}
 }
@@ -32,11 +31,10 @@ func (c *Context) NewSolver() *Solver {
 //
 // Maps to: Z3_mk_solver_from_tactic
 func (c *Context) NewSolverFromTactic(t *Tactic) *Solver {
-	rawSolver := C.Z3_mk_solver_from_tactic(c.raw, t.rawTactic)
-	C.Z3_solver_inc_ref(c.raw, rawSolver)
-
+	rawSolver := C.Z3_mk_solver_from_tactic(c.rawCtx, t.rawTactic)
+	C.Z3_solver_inc_ref(c.rawCtx, rawSolver)
 	return &Solver{
-		rawCtx:    c.raw,
+		rawCtx:    c.rawCtx,
 		rawSolver: rawSolver,
 	}
 }
@@ -90,6 +88,6 @@ func (s *Solver) Model() *Model {
 		rawCtx:   s.rawCtx,
 		rawModel: C.Z3_solver_get_model(s.rawCtx, s.rawSolver),
 	}
-	m.IncRef()
+	C.Z3_model_inc_ref(m.rawCtx, m.rawModel)
 	return m
 }

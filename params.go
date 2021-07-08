@@ -12,9 +12,11 @@ type Params struct {
 
 // NewConfig allocates a new configuration object.
 func (c *Context) NewParams() *Params {
+	rawParams := C.Z3_mk_params(c.rawCtx)
+	C.Z3_params_inc_ref(c.rawCtx, rawParams)
 	return &Params{
-		rawCtx: c.raw,
-		rawParams: C.Z3_mk_params(c.raw),
+		rawCtx: c.rawCtx,
+		rawParams: rawParams,
 	}
 }
 
@@ -32,29 +34,10 @@ func (p *Params) SetBool(k *Symbol, v bool) {
 	C.Z3_params_set_bool(p.rawCtx, p.rawParams, k.rawSymbol, C.bool(v))
 }
 
-//-------------------------------------------------------------------
-// Memory Management
-//-------------------------------------------------------------------
-
 // Close decreases the reference count for this params. If nothing else
 // has manually increased the reference count, this will free the memory
 // associated with it.
 func (p *Params) Close() error {
 	C.Z3_params_dec_ref(p.rawCtx, p.rawParams)
 	return nil
-}
-
-// IncRef increases the reference count of this model. This is advanced,
-// you probably don't need to use this.
-func (p *Params) IncRef() {
-	C.Z3_params_inc_ref(p.rawCtx, p.rawParams)
-}
-
-// DecRef decreases the reference count of this model. This is advanced,
-// you probably don't need to use this.
-//
-// Close will decrease it automatically from the initial 1, so this should
-// only be called with exact matching calls to IncRef.
-func (p *Params) DecRef() {
-	C.Z3_params_dec_ref(p.rawCtx, p.rawParams)
 }

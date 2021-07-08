@@ -10,12 +10,11 @@ type Optimize struct {
 
 // NewOptimize creates a new optimize.
 func (c *Context) NewOptimize() *Optimize {
-	rawOptimize := C.Z3_mk_optimize(c.raw)
-	C.Z3_optimize_inc_ref(c.raw, rawOptimize)
-
+	rawOptimize := C.Z3_mk_optimize(c.rawCtx)
+	C.Z3_optimize_inc_ref(c.rawCtx, rawOptimize)
 	return &Optimize{
+		rawCtx:      c.rawCtx,
 		rawOptimize: rawOptimize,
-		rawCtx:      c.raw,
 	}
 }
 
@@ -81,6 +80,6 @@ func (s *Optimize) Model() *Model {
 		rawCtx:   s.rawCtx,
 		rawModel: C.Z3_optimize_get_model(s.rawCtx, s.rawOptimize),
 	}
-	m.IncRef()
+	C.Z3_model_inc_ref(m.rawCtx, m.rawModel)
 	return m
 }

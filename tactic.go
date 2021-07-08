@@ -11,24 +11,50 @@ type Tactic struct {
 
 // Return a tactic associated with the given name.
 func (c *Context) NewTactic(name string) *Tactic {
+	rawTactic := C.Z3_mk_tactic(c.rawCtx, C.CString(name))
+	C.Z3_tactic_inc_ref(c.rawCtx, rawTactic)
 	return &Tactic{
-		rawCtx: c.raw,
-		rawTactic: C.Z3_mk_tactic(c.raw, C.CString(name)),
+		rawCtx: c.rawCtx,
+		rawTactic: rawTactic,
 	}
-}
-
-// String returns a human-friendly string version of the tactic.
-func (t *Tactic) String() string {
-	return C.GoString(C.Z3_tactic_to_string(t.rawCtx, t.rawTactic))
 }
 
 func (c *Context) GetTacticNames() string {
 	return "qfaufbv, qfauflia, qfbv, qfidl, qflia, qflra, qfnia, qfnra, qfufbv, qfufbv_ackr, qfufnra, qfuf, ufnia, uflra, auflia, auflira, aufnira, lra, lia, lira, ackermannize_bv, simplify, propagate-values, ctx-simplify"
 }
 
-//-------------------------------------------------------------------
-// Memory Management
-//-------------------------------------------------------------------
+// String returns a human-friendly string version of the tactic.
+func (t *Tactic) String() string {
+	//return C.GoString(C.Z3_tactic_to_string(t.rawCtx, t.rawTactic))
+	return "TODO"
+}
+
+func (t *Tactic) With(p *Params) *Tactic {
+	return &Tactic{
+		rawCtx: t.rawCtx,
+		rawTactic: C.Z3_tactic_using_params(t.rawCtx, t.rawTactic, p.rawParams),
+	}
+}
+
+// Z3_tactic_apply
+func (t *Tactic) TacticApply(g *Goal) *ApplyResult {
+	rawApplyResult := C.Z3_tactic_apply(t.rawCtx, t.rawTactic, g.rawGoal)
+	C.Z3_apply_result_inc_ref(t.rawCtx, rawApplyResult)
+	return &ApplyResult{
+		rawCtx: t.rawCtx,
+		rawApplyResult: rawApplyResult,
+	}
+}
+
+// Z3_tactic_apply_ex
+func (t *Tactic) TacticApplyEx(g *Goal, p *Params) *ApplyResult {
+	rawApplyResult := C.Z3_tactic_apply_ex(t.rawCtx, t.rawTactic, g.rawGoal, p.rawParams)
+	C.Z3_apply_result_inc_ref(t.rawCtx, rawApplyResult)
+	return &ApplyResult{
+		rawCtx: t.rawCtx,
+		rawApplyResult: rawApplyResult,
+	}
+}
 
 // Close decreases the reference count for this tactic. If nothing else
 // has manually increased the reference count, this will free the memory
@@ -36,19 +62,4 @@ func (c *Context) GetTacticNames() string {
 func (t *Tactic) Close() error {
 	C.Z3_tactic_dec_ref(t.rawCtx, t.rawTactic)
 	return nil
-}
-
-// IncRef increases the reference count of this tactic. This is advanced,
-// you probably don't need to use this.
-func (t *Tactic) IncRef() {
-	C.Z3_model_inc_ref(t.rawCtx, t.rawTactic)
-}
-
-// DecRef decreases the reference count of this tactic. This is advanced,
-// you probably don't need to use this.
-//
-// Close will decrease it automatically from the initial 1, so this should
-// only be called with exact matching calls to IncRef.
-func (t *Tactic) DecRef() {
-	C.Z3_model_dec_ref(t.rawCtx, t.rawTactic)
 }

@@ -38,8 +38,8 @@ func (a *AST) DeclName() *Symbol {
 // is following identical naming convention.
 func (c *Context) Const(s *Symbol, typ *Sort) *AST {
 	return &AST{
-		rawCtx: c.raw,
-		rawAST: C.Z3_mk_const(c.raw, s.rawSymbol, typ.rawSort),
+		rawCtx: c.rawCtx,
+		rawAST: C.Z3_mk_const(c.rawCtx, s.rawSymbol, typ.rawSort),
 	}
 }
 
@@ -48,8 +48,8 @@ func (c *Context) Const(s *Symbol, typ *Sort) *AST {
 // Maps: Z3_mk_int
 func (c *Context) Int(v int, typ *Sort) *AST {
 	return &AST{
-		rawCtx: c.raw,
-		rawAST: C.Z3_mk_int(c.raw, C.int(v), typ.rawSort),
+		rawCtx: c.rawCtx,
+		rawAST: C.Z3_mk_int(c.rawCtx, C.int(v), typ.rawSort),
 	}
 }
 
@@ -58,8 +58,8 @@ func (c *Context) Int(v int, typ *Sort) *AST {
 // Maps: Z3_mk_real
 func (c *Context) Real(num int, den int, typ *Sort) *AST {
 	return &AST{
-		rawCtx: c.raw,
-		rawAST: C.Z3_mk_real(c.raw, C.int(num), C.int(den)),
+		rawCtx: c.rawCtx,
+		rawAST: C.Z3_mk_real(c.rawCtx, C.int(num), C.int(den)),
 	}
 }
 
@@ -69,8 +69,8 @@ func (c *Context) Real(num int, den int, typ *Sort) *AST {
 func (c *Context) Float(v float64) *AST {
 	//TODO: test if this could work
 	return &AST{
-		rawCtx: c.raw,
-		rawAST: C.Z3_mk_real(c.raw, C.int(v), C.int(1)),
+		rawCtx: c.rawCtx,
+		rawAST: C.Z3_mk_real(c.rawCtx, C.int(v), C.int(1)),
 	}
 }
 
@@ -80,8 +80,8 @@ func (c *Context) Float(v float64) *AST {
 func (c *Context) Str(str string) *AST {
 	//TODO: test if this could work
 	return &AST{
-		rawCtx: c.raw,
-		rawAST: C.Z3_mk_string(c.raw, C.CString(str)),
+		rawCtx: c.rawCtx,
+		rawAST: C.Z3_mk_string(c.rawCtx, C.CString(str)),
 	}
 }
 
@@ -90,15 +90,15 @@ func (c *Context) Str(str string) *AST {
 // RealSeq returns the seq type number.
 func (c *Context) RealSet(reals ...float64) *AST {
 	set := &AST{
-		rawCtx: c.raw,
+		rawCtx: c.rawCtx,
 		rawAST: C.Z3_mk_empty_set(
-			c.raw,
+			c.rawCtx,
 			c.RealSort().rawSort,
 		),
 	}
 	for _, content := range reals {
 		C.Z3_mk_set_add(
-			c.raw,
+			c.rawCtx,
 			set.rawAST,
 			c.Float(content).rawAST,
 		)
@@ -109,15 +109,15 @@ func (c *Context) RealSet(reals ...float64) *AST {
 // StringSet returns the seq type string.
 func (c *Context) StringSet(strings ...string) *AST {
 	set := &AST{
-		rawCtx: c.raw,
+		rawCtx: c.rawCtx,
 		rawAST: C.Z3_mk_empty_set(
-			c.raw,
+			c.rawCtx,
 			c.StringSort().rawSort,
 		),
 	}
 	for _, content := range strings {
 		C.Z3_mk_set_add(
-			c.raw,
+			c.rawCtx,
 			set.rawAST,
 			c.Str(content).rawAST,
 		)
@@ -131,8 +131,8 @@ func (c *Context) StringSet(strings ...string) *AST {
 // Maps: Z3_mk_true
 func (c *Context) True() *AST {
 	return &AST{
-		rawCtx: c.raw,
-		rawAST: C.Z3_mk_true(c.raw),
+		rawCtx: c.rawCtx,
+		rawAST: C.Z3_mk_true(c.rawCtx),
 	}
 }
 
@@ -141,8 +141,8 @@ func (c *Context) True() *AST {
 // Maps: Z3_mk_false
 func (c *Context) False() *AST {
 	return &AST{
-		rawCtx: c.raw,
-		rawAST: C.Z3_mk_false(c.raw),
+		rawCtx: c.rawCtx,
+		rawAST: C.Z3_mk_false(c.rawCtx),
 	}
 }
 

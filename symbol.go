@@ -23,8 +23,8 @@ func (c *Context) Symbol(name string) *Symbol {
 	defer C.free(unsafe.Pointer(ns))
 
 	return &Symbol{
-		rawCtx:    c.raw,
-		rawSymbol: C.Z3_mk_string_symbol(c.raw, ns),
+		rawCtx:    c.rawCtx,
+		rawSymbol: C.Z3_mk_string_symbol(c.rawCtx, ns),
 	}
 }
 
@@ -33,8 +33,8 @@ func (c *Context) Symbol(name string) *Symbol {
 // The memory associated with this symbol is freed when the context is freed.
 func (c *Context) SymbolInt(name int) *Symbol {
 	return &Symbol{
-		rawCtx:    c.raw,
-		rawSymbol: C.Z3_mk_int_symbol(c.raw, C.int(name)),
+		rawCtx:    c.rawCtx,
+		rawSymbol: C.Z3_mk_int_symbol(c.rawCtx, C.int(name)),
 	}
 }
 
