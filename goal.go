@@ -25,9 +25,7 @@ func (t *Goal) String() string {
 
 // Z3_goal_assert
 func (g *Goal) Assert(a *AST) {
-	//fmt.Printf("Assert a = %v\n", a.String())
 	C.Z3_goal_assert(g.rawCtx, g.rawGoal, a.rawAST)
-	//fmt.Printf("Assert done\n")
 }
 
 // Close decreases the reference count for this goal. If nothing else
@@ -36,4 +34,22 @@ func (g *Goal) Assert(a *AST) {
 func (t *Goal) Close() error {
 	C.Z3_goal_dec_ref(t.rawCtx, t.rawGoal)
 	return nil
+}
+
+
+
+// Z3_goal_formula
+func (a *Goal) GetFormula(i int) *AST {
+	rawAST := C.Z3_goal_formula(a.rawCtx, a.rawGoal, C.uint(i))
+	return &AST{
+		rawCtx: a.rawCtx,
+		rawAST: rawAST,
+	}
+}
+
+// Return the number of formulas in the given goal.
+//
+// Maps to: Z3_goal_size
+func (g *Goal) GetGoalSize() int {
+	return int(C.Z3_goal_size(g.rawCtx, g.rawGoal))
 }

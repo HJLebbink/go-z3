@@ -22,3 +22,18 @@ func (a *ApplyResult) Close() error {
 	C.Z3_apply_result_dec_ref(a.rawCtx, a.rawApplyResult)
 	return nil
 }
+
+// Z3_apply_result_get_subgoal
+func (a *ApplyResult) GetSubgoal(i int) *Goal {
+	rawGoal := C.Z3_apply_result_get_subgoal(a.rawCtx, a.rawApplyResult, C.uint(i))
+	C.Z3_goal_inc_ref(a.rawCtx, rawGoal)
+	return &Goal{
+		rawCtx: a.rawCtx,
+		rawGoal: rawGoal,
+	}
+}
+
+// Z3_apply_result_get_num_subgoals
+func (a *ApplyResult) GetNumSubgoals() int {
+	return int(C.Z3_apply_result_get_num_subgoals(a.rawCtx, a.rawApplyResult))
+}

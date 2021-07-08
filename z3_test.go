@@ -224,14 +224,14 @@ func Test_FindModel2(t *testing.T) {
 
 /*
 (declare-fun x () Int)
-(assert (>= x 2))
-(assert (>= x 3))
+(assert (or (>= x 2) (>= x 3)))
 (apply (then ctx-solver-simplify propagate-values (par-then (repeat (or-else split-clause skip)) propagate-ineqs)))
 yields:
 (goals (goal (>= x 3) :precision precise :depth 3))
  */
 
-func Test_Simplify1(t *testing.T) {
+
+func Test_Simplify2(t *testing.T) {
 
 	config := MkConfig()
 	var ctx *Context = MkContext(config)
@@ -266,8 +266,8 @@ func Test_Simplify1(t *testing.T) {
 
 	goal.Assert(y)
 
-	var r *ApplyResult = tactic.Apply(goal)
-	fmt.Printf("ApplyResult = %v\n", r.String())
+	var apply_result *ApplyResult = tactic.Apply(goal)
+	fmt.Printf("ApplyResult = %v\n", apply_result.String())
 
 
 	var solver = ctx.MkSolverFromTactic(tactic)
