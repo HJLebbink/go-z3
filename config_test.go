@@ -5,7 +5,7 @@ import (
 )
 
 func TestConfig(t *testing.T) {
-	c := NewConfig()
+	c := MkConfig()
 	c.SetParamValue("proof", "true")
 	c.Close()
 }

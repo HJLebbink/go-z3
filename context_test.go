@@ -5,9 +5,9 @@ import (
 )
 
 func TestContext(t *testing.T) {
-	config := NewConfig()
+	config := MkConfig()
 	defer config.Close()
 
-	ctx := NewContext(config)
+	ctx := MkContext(config)
 	ctx.Close()
 }

@@ -6,10 +6,10 @@ import (
 )
 
 func TestOptimize(t *testing.T) {
-	config := NewConfig()
+	config := MkConfig()
 	defer config.Close()
 
-	ctx := NewContext(config)
+	ctx := MkContext(config)
 	defer ctx.Close()
 
 	// Create the "x xor y" constraint
@@ -21,7 +21,7 @@ func TestOptimize(t *testing.T) {
 	eleven := ctx.Int(11, intTyp)
 
 	// Create the optimize
-	o := ctx.NewOptimize()
+	o := ctx.MkOptimize()
 	defer o.Close()
 
 	// Assert constraints

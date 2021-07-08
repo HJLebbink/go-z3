@@ -6,30 +6,30 @@ import (
 )
 
 func CreateSolver() (solver *Solver, ctx *Context) {
-	config := NewConfig()
-	ctx = NewContext(config)
+	config := MkConfig()
+	ctx = MkContext(config)
 	err := config.Close()
 	if err != nil {
 		return nil, nil
 	}
 	//defer ctx.Close()
 
-	solver = ctx.NewSolver()
+	solver = ctx.MkSolver()
 	//defer solver.Close()
 	return
 }
 
 func CreateSolverTactic(tactic_name string) (solver *Solver, ctx *Context, tactic *Tactic) {
-	config := NewConfig()
-	ctx = NewContext(config)
+	config := MkConfig()
+	ctx = MkContext(config)
 	err := config.Close()
 	if err != nil {
 		return nil, nil, nil
 	}
 	//defer ctx.Close()
-	tactic = ctx.NewTactic(tactic_name)
+	tactic = ctx.MkTactic(tactic_name)
 
-	solver = ctx.NewSolverFromTactic(tactic)
+	solver = ctx.MkSolverFromTactic(tactic)
 	//defer solver.Close()
 	return
 }
@@ -220,29 +220,30 @@ func Test_FindModel2(t *testing.T) {
 	}
 }
 
-// see https://stackoverflow.com/questions/11507360/t-1-or-t-2-t-1
-// see https://stackoverflow.com/questions/38511917/z3-c-api-set-parameter-for-tactic
-func Test_single_int_range_simplification(t *testing.T) {
 
-	config := NewConfig()
-	var ctx = NewContext(config)
+
+/*
+(declare-fun x () Int)
+(assert (>= x 2))
+(assert (>= x 3))
+(apply (then ctx-solver-simplify propagate-values (par-then (repeat (or-else split-clause skip)) propagate-ineqs)))
+yields:
+(goals (goal (>= x 3) :precision precise :depth 3))
+ */
+
+func Test_Simplify1(t *testing.T) {
+
+	config := MkConfig()
+	var ctx *Context = MkContext(config)
 	config.Close()
-	//defer ctx.Close()
 
-	var params *Params = ctx.NewParams()
-	//params.SetBool(ctx.Symbol("ctx-solver-simplify"), true)
-	//params.SetBool(ctx.Symbol("simplify"), true)
-	params.SetBool(ctx.Symbol("arith_lhs"), true)
-	params.SetBool(ctx.Symbol("eq2ineq"), true)
-	fmt.Printf("params = %v\n", params.String())
+	var ctx_solver_simplify *Tactic = ctx.MkTactic("ctx-solver-simplify")
+	var propagate_values *Tactic = ctx.MkTactic("propagate-values")
+	var split_clause *Tactic = ctx.MkTactic("split-clause")
+	var propagate_ineqs *Tactic = ctx.MkTactic("propagate-ineqs")
+	var skip *Tactic = ctx.MkTactic("skip")
+	var tactic *Tactic = ctx.AndThen(ctx_solver_simplify, ctx.AndThen(propagate_values, ctx.AndThen(ctx.Repeat(ctx.OrElse(split_clause, skip), 10), propagate_ineqs)))
 
-	var goal *Goal = ctx.NewGoal(true, true, false)
-	//fmt.Printf("goal = %v\n", goal.String())
-	//defer goal.Close()
-
-	var tactic *Tactic = ctx.NewTactic("simplify").With(params)
-	//fmt.Printf("tactic = %v\n", tactic.String())
-	//defer tactic.Close()
 
 	var x *AST = ctx.Const(ctx.Symbol("x"), ctx.IntSort())
 
@@ -258,33 +259,106 @@ func Test_single_int_range_simplification(t *testing.T) {
 	//(x > 6) OR (x > 12) -> (x > 12)
 
 	var y *AST = x.Gt(int6).Or(x.Gt(int12))
-	fmt.Printf("y = %v\n", y.String())
+	fmt.Printf("original = %v\n", y.String())
+
+	var goal *Goal = ctx.MkGoal(true, false, false)
+	//defer goal.Close()
+
 	goal.Assert(y)
-	fmt.Printf("goal = %v\n", goal.String())
-	//var r *ApplyResult = tactic.TacticApplyEx(goal, params)
-	var r *ApplyResult = tactic.TacticApply(goal)
+
+	var r *ApplyResult = tactic.Apply(goal)
 	fmt.Printf("ApplyResult = %v\n", r.String())
 
-	/*
-	var z *AST = y.SimplifyEx(params)
-	fmt.Printf("y = %v\nz = %v\n", y.String(), z.String())
-	solver.Assert(z)
-	fmt.Printf("%v\n", solver.String())
+
+	var solver = ctx.MkSolverFromTactic(tactic)
+	solver.Assert(y)
+
+}
 
 
-	if satisfiable := solver.Check(); satisfiable != True {
-		fmt.Printf("unsatisfiable!")
-	} else {
-		fmt.Printf("%v\n", solver.String())
+
+
+// see https://stackoverflow.com/questions/11507360/t-1-or-t-2-t-1
+// see https://stackoverflow.com/questions/38511917/z3-c-api-set-parameter-for-tactic
+func Test_single_int_range_simplification(t *testing.T) {
+
+	config := MkConfig()
+	var ctx *Context = MkContext(config)
+	config.Close()
+
+	ctx.UpdateParamValue("debug_ref_count","true")
+	defer ctx.Close()
+
+	var x *AST = ctx.Const(ctx.Symbol("x"), ctx.IntSort())
+
+	//(x > 6) OR (x < 12) -> TRUE
+	//(x > 6) AND (x < 12) -> (x > 6) AND (x < 12)
+	//(x < 6) OR (x > 12) -> (x < 6) OR (x > 12)
+	//(x < 6) AND (x > 12) -> FALSE
+	//(x > 6) OR (x < 6) -> x != 6
+
+	var int6 = ctx.Int(6, ctx.IntSort())
+	var int12 = ctx.Int(12, ctx.IntSort())
+
+	//(x > 6) OR (x > 12) -> (x > 12)
+
+	var y *AST = x.Gt(int6).Or(x.Gt(int12))
+	fmt.Printf("original = %v\n", y.String())
+
+	if false {
+		fmt.Printf("%v\n", y.SimplifyGetHelp())
+		var params *Params = ctx.MkParams()
+		params.SetBool("arith_lhs", true)
+		params.SetBool("eq2ineq", false)
+		params.SetBool("local_ctx", true)
+		params.SetBool("rewrite_patterns", true)
+		fmt.Printf("params = %v\n", params.String())
+		fmt.Printf("simplify = %v\n", y.SimplifyEx(params).String())
 	}
 
-	//fmt.Printf("%v\n", z.SimplifyGetHelp())
+	if true {
 
-	//(x > 6) AND (x > 12) -> (x > 6)
-	//solver.Assert(x.Gt(int6))
-	//solver.Assert(x.Gt(int12))
-	//var y *AST = x.Simplify()
+		var goal *Goal = ctx.MkGoal(true, false, false)
+		//fmt.Printf("goal = %v\n", goal.String())
+		//defer goal.Close()
 
-//	fmt.Printf("%s\n", y.String())
-*/
+		var params2 *Params = ctx.MkParams()
+		//params2.SetBool("arith.propagate_eqs", true)
+
+		//var tactic *Tactic = ctx.MkTactic("simplify")
+
+		//simplify, propagate-values, ctx-simplify
+
+		var tactic *Tactic = ctx.MkTactic("lia").With(params2)
+		//fmt.Printf("tactic = %v\n", tactic.String())
+		//defer tactic.Close()
+
+		goal.Assert(y)
+		//fmt.Printf("goal = %v\n", goal.String())
+		//var params3 *Params = ctx.MkParams()
+		//var r *ApplyResult = tactic.TacticApplyEx(goal, params3)
+		var r *ApplyResult = tactic.Apply(goal)
+		fmt.Printf("ApplyResult = %v\n", r.String())
+	}
+	if false {
+		solver := ctx.MkSolverForLogic("LIA") // for logics see: http://smtlib.cs.uiowa.edu/logics.shtml
+		solver.Assert(y)
+		solver.Check()
+		//fmt.Printf("%v\n", solver.String())
+
+		if satisfiable := solver.Check(); satisfiable != True {
+			fmt.Printf("unsatisfiable!")
+		} else {
+			fmt.Printf("%v\n", solver.String())
+		}
+
+		//fmt.Printf("%v\n", z.SimplifyGetHelp())
+
+		//(x > 6) AND (x > 12) -> (x > 6)
+		//solver.Assert(x.Gt(int6))
+		//solver.Assert(x.Gt(int12))
+		//var y *AST = x.Simplify()
+
+		//	fmt.Printf("%s\n", y.String())
+	}
 }

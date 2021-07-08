@@ -5,7 +5,7 @@ import "C"
 
 // Solver is a single solver tied to a specific Context within Z3.
 //
-// It is created via the NewSolver methods on Context. When a solver is
+// It is created via the MkSolver methods on Context. When a solver is
 // no longer needed, the Close method must be called. This will remove the
 // solver from the context and no more APIs on Solver may be called
 // thereafter.
@@ -17,9 +17,22 @@ type Solver struct {
 	rawSolver C.Z3_solver
 }
 
-// NewSolver creates a new solver.
-func (c *Context) NewSolver() *Solver {
+// MkSolver creates a new solver.
+func (c *Context) MkSolver() *Solver {
 	rawSolver := C.Z3_mk_solver(c.rawCtx)
+	C.Z3_solver_inc_ref(c.rawCtx, rawSolver)
+	return &Solver{
+		rawCtx:    c.rawCtx,
+		rawSolver: rawSolver,
+	}
+}
+
+// MkSolver creates a new solver for the provided logic
+// for logics see: http://smtlib.cs.uiowa.edu/logics.shtml
+//
+// Maps to: Z3_mk_solver_for_logic
+func (c *Context) MkSolverForLogic(name string) *Solver {
+	rawSolver := C.Z3_mk_solver_for_logic(c.rawCtx, C.Z3_mk_string_symbol(c.rawCtx, C.CString(name)))
 	C.Z3_solver_inc_ref(c.rawCtx, rawSolver)
 	return &Solver{
 		rawCtx:    c.rawCtx,
@@ -30,7 +43,7 @@ func (c *Context) NewSolver() *Solver {
 // Create a new solver that is implemented using the given tactic.
 //
 // Maps to: Z3_mk_solver_from_tactic
-func (c *Context) NewSolverFromTactic(t *Tactic) *Solver {
+func (c *Context) MkSolverFromTactic(t *Tactic) *Solver {
 	rawSolver := C.Z3_mk_solver_from_tactic(c.rawCtx, t.rawTactic)
 	C.Z3_solver_inc_ref(c.rawCtx, rawSolver)
 	return &Solver{
@@ -38,7 +51,6 @@ func (c *Context) NewSolverFromTactic(t *Tactic) *Solver {
 		rawSolver: rawSolver,
 	}
 }
-
 
 // Close frees the memory associated with this.
 func (s *Solver) Close() error {

@@ -9,7 +9,7 @@ type Optimize struct {
 }
 
 // NewOptimize creates a new optimize.
-func (c *Context) NewOptimize() *Optimize {
+func (c *Context) MkOptimize() *Optimize {
 	rawOptimize := C.Z3_mk_optimize(c.rawCtx)
 	C.Z3_optimize_inc_ref(c.rawCtx, rawOptimize)
 	return &Optimize{

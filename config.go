@@ -9,7 +9,7 @@ import (
 import "C"
 
 // Config is used to set configuration for Z3. This should be created with
-// NewConfig and closed with Close when you're done using it.
+// MkConfig and closed with Close when you're done using it.
 //
 // Config structures are used to set parameters for Z3 behavior. See the
 // Z3 docs for information on available parameters. They can be set with
@@ -19,8 +19,8 @@ type Config struct {
 	raw C.Z3_config
 }
 
-// NewConfig allocates a new configuration object.
-func NewConfig() *Config {
+// MkConfig allocates a new configuration object.
+func MkConfig() *Config {
 	return &Config{
 		raw: C.Z3_mk_config(),
 	}

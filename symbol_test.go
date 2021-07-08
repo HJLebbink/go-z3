@@ -5,10 +5,10 @@ import (
 )
 
 func TestSymbol(t *testing.T) {
-	config := NewConfig()
+	config := MkConfig()
 	defer config.Close()
 
-	ctx := NewContext(config)
+	ctx := MkContext(config)
 	defer ctx.Close()
 
 	// String symbol

@@ -5,10 +5,10 @@ import (
 )
 
 func TestModelAssignments(t *testing.T) {
-	config := NewConfig()
+	config := MkConfig()
 	defer config.Close()
 
-	ctx := NewContext(config)
+	ctx := MkContext(config)
 	defer ctx.Close()
 
 	// Create a symbol
@@ -20,7 +20,7 @@ func TestModelAssignments(t *testing.T) {
 	t.Logf("\nAST:\n%s", ast.String())
 
 	// Create the solver
-	s := ctx.NewSolver()
+	s := ctx.MkSolver()
 	defer s.Close()
 
 	// Assert constraints
@@ -47,10 +47,10 @@ func TestModelAssignments(t *testing.T) {
 }
 
 func TestModelEval(t *testing.T) {
-	config := NewConfig()
+	config := MkConfig()
 	defer config.Close()
 
-	ctx := NewContext(config)
+	ctx := MkContext(config)
 	defer ctx.Close()
 
 	// Create a symbol
@@ -62,7 +62,7 @@ func TestModelEval(t *testing.T) {
 	t.Logf("\nAST:\n%s", ast.String())
 
 	// Create the solver
-	s := ctx.NewSolver()
+	s := ctx.MkSolver()
 	defer s.Close()
 
 	// Assert constraints

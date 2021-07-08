@@ -5,9 +5,9 @@ import (
 )
 
 func TestASTDistinct(t *testing.T) {
-	config := NewConfig()
+	config := MkConfig()
 	defer config.Close()
-	ctx := NewContext(config)
+	ctx := MkContext(config)
 	defer ctx.Close()
 
 	// Create an int
@@ -25,9 +25,9 @@ func TestASTDistinct(t *testing.T) {
 }
 
 func TestASTNot(t *testing.T) {
-	config := NewConfig()
+	config := MkConfig()
 	defer config.Close()
-	ctx := NewContext(config)
+	ctx := MkContext(config)
 	defer ctx.Close()
 
 	// Create an int
@@ -43,9 +43,9 @@ func TestASTNot(t *testing.T) {
 }
 
 func TestASTEq(t *testing.T) {
-	config := NewConfig()
+	config := MkConfig()
 	defer config.Close()
-	ctx := NewContext(config)
+	ctx := MkContext(config)
 	defer ctx.Close()
 
 	// Create an int
@@ -62,9 +62,9 @@ func TestASTEq(t *testing.T) {
 }
 
 func TestASTIte(t *testing.T) {
-	config := NewConfig()
+	config := MkConfig()
 	defer config.Close()
-	ctx := NewContext(config)
+	ctx := MkContext(config)
 	defer ctx.Close()
 
 	// Create an int
@@ -81,9 +81,9 @@ func TestASTIte(t *testing.T) {
 }
 
 func TestASTIff(t *testing.T) {
-	config := NewConfig()
+	config := MkConfig()
 	defer config.Close()
-	ctx := NewContext(config)
+	ctx := MkContext(config)
 	defer ctx.Close()
 
 	// Create an int
@@ -99,9 +99,9 @@ func TestASTIff(t *testing.T) {
 }
 
 func TestASTImplies(t *testing.T) {
-	config := NewConfig()
+	config := MkConfig()
 	defer config.Close()
-	ctx := NewContext(config)
+	ctx := MkContext(config)
 	defer ctx.Close()
 
 	// Create an int
@@ -118,9 +118,9 @@ func TestASTImplies(t *testing.T) {
 }
 
 func TestASTXor(t *testing.T) {
-	config := NewConfig()
+	config := MkConfig()
 	defer config.Close()
-	ctx := NewContext(config)
+	ctx := MkContext(config)
 	defer ctx.Close()
 
 	// Create an int
@@ -137,9 +137,9 @@ func TestASTXor(t *testing.T) {
 }
 
 func TestASTAnd(t *testing.T) {
-	config := NewConfig()
+	config := MkConfig()
 	defer config.Close()
-	ctx := NewContext(config)
+	ctx := MkContext(config)
 	defer ctx.Close()
 
 	// Create an int
@@ -156,9 +156,9 @@ func TestASTAnd(t *testing.T) {
 }
 
 func TestASTOr(t *testing.T) {
-	config := NewConfig()
+	config := MkConfig()
 	defer config.Close()
-	ctx := NewContext(config)
+	ctx := MkContext(config)
 	defer ctx.Close()
 
 	// Create an int

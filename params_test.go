@@ -6,13 +6,13 @@ import (
 )
 
 func TestParams_SetBool(t *testing.T) {
-	var config = NewConfig()
+	var config = MkConfig()
 	defer config.Close()
-	var ctx = NewContext(config)
+	var ctx = MkContext(config)
 	defer ctx.Close()
-	var params = ctx.NewParams()
+	var params = ctx.MkParams()
 	defer params.Close()
 
-	params.SetBool(ctx.Symbol("ctx-solver-simplify"), true)
+	params.SetBool("ctx-solver-simplify", true)
 	fmt.Printf("%v\n", params.String())
 }

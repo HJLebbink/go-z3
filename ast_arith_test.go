@@ -5,10 +5,10 @@ import (
 )
 
 func TestASTAdd(t *testing.T) {
-	config := NewConfig()
+	config := MkConfig()
 	defer config.Close()
 
-	ctx := NewContext(config)
+	ctx := MkContext(config)
 	defer ctx.Close()
 
 	// Create an int
@@ -26,10 +26,10 @@ func TestASTAdd(t *testing.T) {
 }
 
 func TestASTMul(t *testing.T) {
-	config := NewConfig()
+	config := MkConfig()
 	defer config.Close()
 
-	ctx := NewContext(config)
+	ctx := MkContext(config)
 	defer ctx.Close()
 
 	// Create an int
@@ -47,10 +47,10 @@ func TestASTMul(t *testing.T) {
 }
 
 func TestASTSub(t *testing.T) {
-	config := NewConfig()
+	config := MkConfig()
 	defer config.Close()
 
-	ctx := NewContext(config)
+	ctx := MkContext(config)
 	defer ctx.Close()
 
 	// Create an int
@@ -68,9 +68,9 @@ func TestASTSub(t *testing.T) {
 }
 
 func TestASTLt(t *testing.T) {
-	config := NewConfig()
+	config := MkConfig()
 	defer config.Close()
-	ctx := NewContext(config)
+	ctx := MkContext(config)
 	defer ctx.Close()
 
 	// Create an int
@@ -87,9 +87,9 @@ func TestASTLt(t *testing.T) {
 }
 
 func TestASTLe(t *testing.T) {
-	config := NewConfig()
+	config := MkConfig()
 	defer config.Close()
-	ctx := NewContext(config)
+	ctx := MkContext(config)
 	defer ctx.Close()
 
 	// Create an int
@@ -106,9 +106,9 @@ func TestASTLe(t *testing.T) {
 }
 
 func TestASTGt(t *testing.T) {
-	config := NewConfig()
+	config := MkConfig()
 	defer config.Close()
-	ctx := NewContext(config)
+	ctx := MkContext(config)
 	defer ctx.Close()
 
 	// Create an int
@@ -125,9 +125,9 @@ func TestASTGt(t *testing.T) {
 }
 
 func TestASTGe(t *testing.T) {
-	config := NewConfig()
+	config := MkConfig()
 	defer config.Close()
-	ctx := NewContext(config)
+	ctx := MkContext(config)
 	defer ctx.Close()
 
 	// Create an int

@@ -5,9 +5,9 @@ import (
 )
 
 func TestSolver(t *testing.T) {
-	config := NewConfig()
+	config := MkConfig()
 	defer config.Close()
-	ctx := NewContext(config)
+	ctx := MkContext(config)
 	defer ctx.Close()
 
 	// Create the "x xor y" constraint
@@ -19,7 +19,7 @@ func TestSolver(t *testing.T) {
 	t.Logf("\nAST:\n%s", ast.String())
 
 	// Create the solver
-	s := ctx.NewSolver()
+	s := ctx.MkSolver()
 	defer s.Close()
 
 	// Assert constraints
@@ -38,10 +38,10 @@ func TestSolver(t *testing.T) {
 }
 
 func TestRealSolver(t *testing.T) {
-	config := NewConfig()
+	config := MkConfig()
 	defer config.Close()
 
-	ctx := NewContext(config)
+	ctx := MkContext(config)
 	defer ctx.Close()
 
 	x := ctx.Const(ctx.Symbol("x"), ctx.RealSort())
@@ -50,7 +50,7 @@ func TestRealSolver(t *testing.T) {
 	t.Logf("\nAST:\n%s", ast.String())
 
 	// Create the solver
-	s := ctx.NewSolver()
+	s := ctx.MkSolver()
 	defer s.Close()
 
 	// Assert constraints

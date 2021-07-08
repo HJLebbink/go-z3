@@ -6,9 +6,9 @@ import (
 )
 
 func TestContextErrorHandler(t *testing.T) {
-	config := NewConfig()
+	config := MkConfig()
 	defer config.Close()
-	ctx := NewContext(config)
+	ctx := MkContext(config)
 	defer ctx.Close()
 
 	// Set an error handler

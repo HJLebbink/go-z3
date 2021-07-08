@@ -9,7 +9,7 @@ type Goal struct {
 }
 
 // Create a new goal
-func (c *Context) NewGoal(models, unsat_cores, proofs bool) *Goal {
+func (c *Context) MkGoal(models, unsat_cores, proofs bool) *Goal {
 	rawGoal := C.Z3_mk_goal(c.rawCtx, C.bool(models), C.bool(unsat_cores), C.bool(proofs))
 	C.Z3_goal_inc_ref(c.rawCtx, rawGoal)
 	return &Goal{
